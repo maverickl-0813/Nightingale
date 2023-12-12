@@ -1,0 +1,8 @@
+OpenAPI spec:
+ - https://data.nhi.gov.tw/openapi.json
+
+Website:
+ - https://data.nhi.gov.tw/Datasets/DatasetList.aspx?h=1
+
+MongoDB via docker:
+ - https://www.mongodb.com/compatibility/docker
