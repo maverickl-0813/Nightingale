@@ -4,6 +4,7 @@ import yaml
 from timer import timer
 from pathlib import Path
 from data_controller import DataController
+from medical_site_data_struct import MedicalSiteDataBase
 
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
@@ -18,6 +19,12 @@ class FetchMedicalSites:
         config_file = Path("nhi_data_source_config.yaml")
         with open(config_file, 'r', encoding='utf-8') as config:
             self.data_source_config = yaml.safe_load(config)
+
+    @staticmethod
+    def _convert_raw_data(raw_data_entry):
+        medical_site_data = MedicalSiteDataBase()
+        medical_site_data.insert_data(raw_data_entry)
+        return medical_site_data.get_medical_site_data()
 
     def _request_data_with_resource_id(self, identifier_id, resource_id):
         # Fetch data count with identifiers
@@ -34,26 +41,25 @@ class FetchMedicalSites:
 
         # Fetch data store
         resource_url = f"https://{self.data_source_config.get('host')}{self.data_source_config.get('resource_api_path')}{resource_id}"
-        # first 1~1000
+        # First 1~1000
         response = requests.get(resource_url)
         logging.debug("Fetch data range <= 1000.")
-        temp_result = response.json().get("result").get("records")
-        data_records += temp_result
-        # # continue with increasing offset
-        # if data_count > iter_limit:
-        #     for i in range(1, data_count // iter_limit + 1):
-        #         fetch_params = {'offset': i*iter_limit}
-        #         logging.debug(f"Total data count is {data_count}. Fetch data from offset {i * iter_limit}")
-        #         response = requests.get(resource_url, params=fetch_params)
-        #         result = response.json().get("result").get("records")
-        #         data_records += result
+        temp_result_list = response.json().get("result").get("records")
+        for temp_result in temp_result_list:
+            converted_data = self._convert_raw_data(temp_result)
+            data_records.append(converted_data)
+        # data_records += temp_result_list
+        # Greedy fetch while each round returns 1000 (limit) entries.
         i = 1
-        while len(temp_result) == iter_limit:     # Greedy fetch while each round returns 1000 (limit) entries.
+        while len(temp_result_list) == iter_limit:
             fetch_params = {'offset': i * iter_limit}
             logging.debug(f"Continue to fetch data from offset {i * iter_limit}")
             response = requests.get(resource_url, params=fetch_params)
-            temp_result = response.json().get("result").get("records")
-            data_records += temp_result
+            temp_result_list = response.json().get("result").get("records")
+            for temp_result in temp_result_list:
+                converted_data = self._convert_raw_data(temp_result)
+                data_records.append(converted_data)
+            # data_records += temp_result_list
             i += 1
 
         logging.info(f"Fetched total {len(data_records)} entries, compared with NHI data count {data_count}.")
@@ -72,9 +78,9 @@ class FetchMedicalSites:
         else:
             logging.debug("Replacing old data with new ones.")
             for medical_site in data_list:
-                site_name = medical_site.get("Hosp_Name")
-                query = {"Hosp_Name": site_name}
-                logging.debug(f"Processing {site_name}.")
+                site_id = medical_site.get("site_id")
+                query = {"Hosp_ID": site_id}
+                logging.debug(f"Processing {site_id}.")
                 if self.db_controller.count_in_collection(db_collection, query) > 0:
                     self.db_controller.replace_one_to_collection(db_collection, query, medical_site)
         count = self.db_controller.count_in_collection(db_collection)
