@@ -81,6 +81,10 @@ class FetchMedicalSites:
                 logging.debug(f"Processing {site_id}.")
                 if self.db_controller.count_in_collection(db_collection, query) > 0:
                     self.db_controller.replace_one_to_collection(db_collection, query, medical_site)
+
+        # Create additional index to site_id and site_name
+        self.db_controller.create_index_in_collection(db_collection, "site_id.value", unique=True)
+        self.db_controller.create_index_in_collection(db_collection, "site_name.value", unique=True)
         count = self.db_controller.count_in_collection(db_collection)
         return count
 
