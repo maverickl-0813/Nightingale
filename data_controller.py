@@ -48,3 +48,8 @@ class DataController:
         self.collection_name = resource
         self._set_collection()
         self.collection_inst.delete_many({})
+
+    def create_index_in_collection(self, resource, field, unique=False):
+        self.collection_name = resource
+        self._set_collection()
+        self.collection_inst.create_index(field, unique=unique)
