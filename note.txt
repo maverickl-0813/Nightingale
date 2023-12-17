@@ -6,3 +6,19 @@ Website:
 
 MongoDB via docker:
  - https://www.mongodb.com/compatibility/docker
+
+Full field names from NHI datastore:
+  - "Hosp_ID"
+  - "Hosp_Name"
+  - "Hosp_Code_CName"
+  - "Tel"
+  - "Address"
+  - "Branch_Type_CName"
+  - "Special_Type_CName"
+  - "Service_CName"
+  - "FuncType_CName"
+  - "Closeshop"
+  - "HolidayDuty_CName"
+  - "Holiday_Remark_CName"
+  - "GovAreaNo"
+  - "CONT_S_DATE"

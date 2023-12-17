@@ -4,7 +4,7 @@ import yaml
 from timer import timer
 from pathlib import Path
 from data_controller import DataController
-from medical_site_data_struct import MedicalSiteDataBase
+from medical_site_data_struct import MedicalSiteDataStructure
 
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
@@ -22,7 +22,7 @@ class FetchMedicalSites:
 
     @staticmethod
     def _convert_raw_data(raw_data_entry):
-        medical_site_data = MedicalSiteDataBase()
+        medical_site_data = MedicalSiteDataStructure()
         medical_site_data.insert_data(raw_data_entry)
         return medical_site_data.get_medical_site_data()
 
@@ -83,8 +83,8 @@ class FetchMedicalSites:
                     self.db_controller.replace_one_to_collection(db_collection, query, medical_site)
 
         # Create additional index to site_id and site_name
-        self.db_controller.create_index_in_collection(db_collection, "site_id.value", unique=True)
-        self.db_controller.create_index_in_collection(db_collection, "site_name.value", unique=True)
+        self.db_controller.create_index_in_collection(db_collection, "site_id", unique=True)
+        self.db_controller.create_index_in_collection(db_collection, "site_name", unique=True)
         count = self.db_controller.count_in_collection(db_collection)
         return count
 

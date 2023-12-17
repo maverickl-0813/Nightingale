@@ -1,0 +1,28 @@
+fields:
+  site_id: ""
+  site_name: ""
+  site_type: ""
+  site_telephone: ""
+  site_address: ""
+  site_service_list: []
+  site_function_list: []
+  site_working_hours:
+    Monday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Tuesday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Wednesday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Thursday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Friday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Saturday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+    Sunday: {'morning': "N", 'afternoon': "N", 'evening': "N"}
+  site_remark: ""
+
+field_mapping:
+  site_id: "Hosp_ID"
+  site_name: "Hosp_Name"
+  site_type: "Special_Type_CName"
+  site_telephone: "Tel"
+  site_address: "Address"
+  site_service_list: "Service_CName"
+  site_function_list: "FuncType_CName"
+  site_working_hours: "HolidayDuty_CName"
+  site_remark: "Holiday_Remark_CName"

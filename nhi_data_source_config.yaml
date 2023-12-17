@@ -1,6 +1,7 @@
 host: "data.nhi.gov.tw"
 identifier_api_path: "/api/v1/rest/dataset/"
 resource_api_path: "/api/v1/rest/datastore/"
+limit: 1000
 identifiers:
   pharmacy: "A21030000I-D21005"
   small_clinic: "A21030000I-D21004"
@@ -13,19 +14,3 @@ resources:
   district_hospital: "A21030000I-D21003-003"
   regional_hospital: "A21030000I-D21002-005"
   medical_center: "A21030000I-D21001-003"
-limit: 1000
-fields:
-  - "Hosp_ID"
-  - "Hosp_Name"
-  - "Hosp_Code_CName"
-  - "Tel"
-  - "Address"
-  - "Branch_Type_CName"
-  - "Special_Type_CName"
-  - "Service_CName"
-  - "FuncType_CName"
-  - "Closeshop"
-  - "HolidayDuty_CName"
-  - "Holiday_Remark_CName"
-  - "GovAreaNo"
-  - "CONT_S_DATE"
