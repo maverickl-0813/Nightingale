@@ -41,11 +41,9 @@ class MedicalSiteDataStructure:
                 splitter = None
                 if "," in data_dict[self.data_mapping.get(key)]:
                     splitter = ','
-                # elif '、' in data_dict[self.data_mapping.get(key)]:
-                #     splitter = '、'
                 self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip().split(splitter)
             elif isinstance(self.base_structure.get(key), dict):
-                if key == "site_working_hours":
+                if key == "site_working_hours" and data_dict.get(self.data_mapping.get(key)):
                     self._process_working_hours(data_dict[self.data_mapping.get(key)])
             else:
                 self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip()
