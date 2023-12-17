@@ -82,9 +82,11 @@ class FetchMedicalSites:
                 if self.db_controller.count_in_collection(db_collection, query) > 0:
                     self.db_controller.replace_one_to_collection(db_collection, query, medical_site)
 
-        # Create additional index to site_id and site_name
+        # Create additional index
         self.db_controller.create_index_in_collection(db_collection, "site_id", unique=True)    # ID is unique.
         self.db_controller.create_index_in_collection(db_collection, "site_name")
+        self.db_controller.create_index_in_collection(db_collection, "site_region_lv1")
+        self.db_controller.create_index_in_collection(db_collection, "site_region_lv2")
         count = self.db_controller.count_in_collection(db_collection)
         return count
 

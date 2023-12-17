@@ -33,7 +33,19 @@ class MedicalSiteDataStructure:
             zh_day = opening[:3]
             am_pm = opening[3:5]
             work = opening[-2:]
-            self.base_structure.get("site_working_hours")[zh_day_name_mappings.get(zh_day)][am_pm_mappings.get(am_pm)] = open_mappings.get(work)
+            self.base_structure["site_working_hours"][zh_day_name_mappings.get(zh_day)][am_pm_mappings.get(am_pm)] = open_mappings.get(work)
+
+    def _process_address(self, address_string):
+        # lv1_region_tags = ['縣', '市']
+        lv2_region_tags = ['鄉', '鎮', '市', '區']
+        # for lv1_tag in lv1_region_tags:
+        #     if lv1_tag in address_string[:3]:
+        #         self.base_structure["site_region_lv1"] = address_string[:3]
+        self.base_structure["site_region_lv1"] = address_string[:3]
+        for lv2_tag in lv2_region_tags:
+            if lv2_tag in address_string[3:]:
+                lv2_tag_index = address_string.index(lv2_tag)
+                self.base_structure["site_region_lv2"] = address_string[:lv2_tag_index+1]
 
     def insert_data(self, data_dict):
         for key in self.base_structure.keys():
@@ -43,10 +55,18 @@ class MedicalSiteDataStructure:
                     splitter = ','
                 self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip().split(splitter)
             elif isinstance(self.base_structure.get(key), dict):
-                if key == "site_working_hours" and data_dict.get(self.data_mapping.get(key)):
+                if key == "site_working_hours" and data_dict.get(self.data_mapping.get(key)):   # process working hour data.
                     self._process_working_hours(data_dict[self.data_mapping.get(key)])
-            else:
-                self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip()
+            else:   # All other string type data.
+                if key == "site_address":   # process address to expend regional data
+                    address_string = data_dict[self.data_mapping.get(key)].strip()
+                    self.base_structure[key] = address_string
+                    self._process_address(address_string)
+                elif key == "site_telephone":     # remove strange space(s) in the phone number
+                    self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip().replace(' ', '')
+                else:
+                    if self.data_mapping.get(key):  # other keys that has mapping.
+                        self.base_structure[key] = data_dict[self.data_mapping.get(key)].strip()
 
     def get_medical_site_data(self):
         return self.base_structure

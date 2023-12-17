@@ -4,6 +4,8 @@ fields:
   site_type: ""
   site_telephone: ""
   site_address: ""
+  site_region_lv1: ""
+  site_region_lv2: ""
   site_service_list: []
   site_function_list: []
   site_working_hours:
