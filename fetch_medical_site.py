@@ -77,16 +77,19 @@ class FetchMedicalSites:
             logging.debug("Replacing old data with new ones.")
             for medical_site in data_list:
                 site_id = medical_site.get("site_id")
-                query = {"Hosp_ID": site_id}
+                query = {"site_id": site_id}
                 logging.debug(f"Processing {site_id}.")
-                if self.db_controller.count_in_collection(db_collection, query) > 0:
+                if exists := self.db_controller.count_in_collection(db_collection, query) > 0:
+                    logging.debug(f"The site id {site_id} exists: {exists}.")
                     self.db_controller.replace_one_to_collection(db_collection, query, medical_site)
+                else:
+                    self.db_controller.insert_one_to_collection(db_collection, medical_site)
 
         # Create additional index
         self.db_controller.create_index_in_collection(db_collection, "site_id", unique=True)    # ID is unique.
         self.db_controller.create_index_in_collection(db_collection, "site_name")
         self.db_controller.create_index_in_collection(db_collection, "site_region_lv1")
-        self.db_controller.create_index_in_collection(db_collection, "site_region_lv2")
+        self.db_controller.create_index_in_collection(db_collection, ["site_region_lv1", "site_region_lv2"])
         count = self.db_controller.count_in_collection(db_collection)
         return count
 

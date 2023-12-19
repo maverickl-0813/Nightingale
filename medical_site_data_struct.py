@@ -45,7 +45,7 @@ class MedicalSiteDataStructure:
         for lv2_tag in lv2_region_tags:
             if lv2_tag in address_string[3:]:
                 lv2_tag_index = address_string.index(lv2_tag)
-                self.base_structure["site_region_lv2"] = address_string[:lv2_tag_index+1]
+                self.base_structure["site_region_lv2"] = address_string[3:lv2_tag_index+1]
 
     def insert_data(self, data_dict):
         for key in self.base_structure.keys():
