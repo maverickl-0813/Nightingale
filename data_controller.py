@@ -39,6 +39,11 @@ class DataController:
         self._set_collection()
         self.collection_inst.insert_many(list_data)
 
+    def insert_one_to_collection(self, resource, data):
+        self.collection_name = resource
+        self._set_collection()
+        self.collection_inst.insert_one(data)
+
     def replace_one_to_collection(self, resource, old_filter, new_entry):
         self.collection_name = resource
         self._set_collection()
