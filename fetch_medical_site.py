@@ -43,21 +43,26 @@ class FetchMedicalSites:
         resource_url = f"https://{self.data_source_config.get('host')}{self.data_source_config.get('resource_api_path')}{resource_id}"
         # First 1~1000
         response = requests.get(resource_url)
-        logging.debug("Fetch data range <= 1000.")
+        logging.debug(f"Fetch data range <= {iter_limit}.")
         temp_result_list = response.json().get("result").get("records")
         for temp_result in temp_result_list:
             converted_data = self._convert_raw_data(temp_result)
-            data_records.append(converted_data)
+            if converted_data:
+                data_records.append(converted_data)
         # Greedy fetch while each round returns 1000 (limit) entries.
         i = 1
         while len(temp_result_list) == iter_limit:
-            fetch_params = {'offset': i * iter_limit}
+            fetch_params = {'offset': i * iter_limit, 'limit': iter_limit}
             logging.debug(f"Continue to fetch data from offset {i * iter_limit}")
             response = requests.get(resource_url, params=fetch_params)
+            if not response.json().get("result"):
+                logging.error(f"Incomplete data found in the response, stop fetching data from NHI. {response.json()}")
+                break
             temp_result_list = response.json().get("result").get("records")
             for temp_result in temp_result_list:
                 converted_data = self._convert_raw_data(temp_result)
-                data_records.append(converted_data)
+                if converted_data:
+                    data_records.append(converted_data)
             i += 1
 
         logging.info(f"Fetched total {len(data_records)} entries, compared with NHI data count {data_count}.")
