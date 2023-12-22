@@ -26,6 +26,14 @@ class DataController:
         for row in rows:
             print(row)
 
+    def query_one_in_collection(self, resource, query_filter=None):
+        self.collection_name = resource
+        self._set_collection()
+        if not query_filter:
+            query_filter = dict()
+        query_result = self.collection_inst.find_one(query_filter)
+        return query_result
+
     def count_in_collection(self, resource, query_filter=None):
         self.collection_name = resource
         self._set_collection()
