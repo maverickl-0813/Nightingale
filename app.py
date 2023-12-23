@@ -1,10 +1,10 @@
 from flask import Flask
 from flask_restful import Api
-from medical_site_data_service import GetSiteBasicData
-from medical_site_data_service import GetSiteCountByType
-from medical_site_data_service import GetMedicalSiteList
-from medical_site_data_service import GetSiteWorkingHours
-from medical_site_data_service import GetSiteListByDivision
+from service_facility_by_type import GetSiteBasicData
+from service_facility_by_type import GetSiteCountByType
+from service_facility_by_type import GetMedicalSiteList
+from service_facility_by_type import GetSiteWorkingHours
+from service_facility_by_type import GetSiteListByDivision
 
 
 if __name__ == '__main__':
