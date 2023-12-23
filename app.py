@@ -14,5 +14,5 @@ if __name__ == '__main__':
     api.add_resource(GetSiteCountByType, "/site_count")
     api.add_resource(GetMedicalSiteList, "/list_sites")
     api.add_resource(GetSiteWorkingHours, "/working_hours")
-    api.add_resource(GetSiteListByDivision, "/search_site_by_division")
+    api.add_resource(GetSiteListByDivision, "/list_sites_by_division")
     app.run(host='0.0.0.0', port=6400, ssl_context="adhoc", debug=True)
