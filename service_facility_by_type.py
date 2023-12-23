@@ -2,7 +2,7 @@ from flask import request
 from api_service_base import BaseClass
 
 
-supported_medical_site = ["medical_center", "regional_hospital", "district_hospital"]
+supported_medical_site = ["medical_center", "regional_hospital", "district_hospital", "small_clinic"]
 
 
 class GetSiteBasicData(BaseClass):
