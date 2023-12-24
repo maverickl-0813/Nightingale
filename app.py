@@ -6,6 +6,7 @@ from service_facility_by_type import GetMedicalSiteList
 from service_facility_by_type import GetSiteWorkingHours
 from service_facility_by_type import GetSiteListByDivision
 from service_facility_by_type import GetSiteCountByDivision
+from service_facility_by_type import GetSiteListByDivisionAndFunction
 
 
 app = Flask(__name__)
@@ -17,7 +18,8 @@ endpoints = {
     "/list_sites": GetMedicalSiteList,
     "/working_hours": GetSiteWorkingHours,
     "/list_sites_by_division": GetSiteListByDivision,
-    "/site_count_by_division": GetSiteCountByDivision
+    "/site_count_by_division": GetSiteCountByDivision,
+    "/search_function_with_division": GetSiteListByDivisionAndFunction
 }
 
 

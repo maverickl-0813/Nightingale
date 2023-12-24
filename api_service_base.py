@@ -93,3 +93,25 @@ class BaseClass(Resource):
                 query_filter = {'site_region_lv1': site_division}
             count = self.db_controller.count_in_collection(resource=site_type, query_filter=query_filter)
         return count
+
+    def _query_site_list_by_division_and_function_list(self, site_type, site_division, site_function_list):
+        results = list()
+        query_filter = dict()
+        site_division = self._replace_tai(site_division)
+        if site_division:
+            if len(site_division) > 3:
+                division_lv1 = site_division[:3]
+                division_lv2 = site_division[3:]
+                query_filter['site_region_lv1'] = division_lv1
+                query_filter['site_region_lv2'] = division_lv2
+            else:
+                query_filter['site_region_lv1'] = site_division
+        if site_function_list:
+            query_filter['site_function_list'] = {'$all': site_function_list}
+
+        query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
+        for item in query_results_bson:
+            item = self._convert_mongodb_output_to_json(item)
+            del item["_id"]
+            results.append(item)
+        return results
