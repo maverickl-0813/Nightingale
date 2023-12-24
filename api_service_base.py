@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bson import json_util
 import json
 from flask_restful import Resource
@@ -36,6 +37,11 @@ class BaseClass(Resource):
             return False
         return True
 
+    @staticmethod
+    def _replace_tai(text):
+        text = text.replace("台", "臺")
+        return text
+
     def _list_sites_by_type(self, site_type):
         results = list()
         query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type)
@@ -56,6 +62,7 @@ class BaseClass(Resource):
 
     def _query_site_list_by_division(self, site_type, site_division):
         results = list()
+        site_division = self._replace_tai(site_division)
         if site_division:
             if len(site_division) > 3:
                 division_lv1 = site_division[:3]
@@ -76,6 +83,7 @@ class BaseClass(Resource):
 
     def _count_site_by_division(self, site_type, site_division):
         count = 0
+        site_division = self._replace_tai(site_division)
         if site_division:
             if len(site_division) > 3:
                 division_lv1 = site_division[:3]
