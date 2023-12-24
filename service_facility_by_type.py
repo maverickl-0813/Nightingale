@@ -89,8 +89,8 @@ class GetSiteCountByType(BaseClass):
 class GetSiteListByDivision(BaseClass):
 
     def __init__(self):
-        self.supported_medical_site = supported_medical_site
         super().__init__()
+        self.supported_medical_site = supported_medical_site
 
     def get(self):
         site_type = request.args.get("type")
@@ -111,8 +111,8 @@ class GetSiteListByDivision(BaseClass):
 class GetSiteCountByDivision(BaseClass):
 
     def __init__(self):
-        self.supported_medical_site = supported_medical_site
         super().__init__()
+        self.supported_medical_site = supported_medical_site
 
     def get(self):
         site_type = request.args.get("type")
