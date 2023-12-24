@@ -13,9 +13,28 @@ class BaseClass(Resource):
     def _convert_mongodb_output_to_json(data):
         return json.loads(json.dumps(data, default=json_util.default))
 
-    def _validate_site_type(self, site_type):
+    @staticmethod
+    def _return_error_status(status_code, message):
+        return {'status': "error", 'error': {'code': int(status_code), 'message': message}}, int(status_code)
+
+    @staticmethod
+    def _return_success_status(data):
+        if data:
+            return {'status': "success", 'data': data}, 200
+        else:
+            return {'status': "success"}, 200
+
+    @staticmethod
+    def _is_required_args_exists(arg_list):
+        for arg in arg_list:
+            if not arg:
+                return False
+        return True
+
+    def _is_site_type_valid(self, site_type):
         if site_type not in self.supported_medical_site:
-            return {'message': f"Not supported medical site type: {site_type}"}, 400
+            return False
+        return True
 
     def _list_sites_by_type(self, site_type):
         results = list()
@@ -53,4 +72,16 @@ class BaseClass(Resource):
 
     def _count_site_by_type(self, site_type):
         count = self.db_controller.count_in_collection(resource=site_type)
+        return count
+
+    def _count_site_by_division(self, site_type, site_division):
+        count = 0
+        if site_division:
+            if len(site_division) > 3:
+                division_lv1 = site_division[:3]
+                division_lv2 = site_division[3:]
+                query_filter = {'site_region_lv1': division_lv1, 'site_region_lv2': division_lv2}
+            else:
+                query_filter = {'site_region_lv1': site_division}
+            count = self.db_controller.count_in_collection(resource=site_type, query_filter=query_filter)
         return count
