@@ -3,12 +3,15 @@ from bson import json_util
 import json
 from flask_restful import Resource
 from DataMaintenanceProcess.data_controller import DataController
+import taiwan_division_list
 
 
 class BaseClass(Resource):
     def __init__(self):
         self.db_controller = DataController()
         self.supported_medical_site = list()
+        self.tw_division_list = taiwan_division_list.area_data
+        self.tw_lv1_list = self.tw_division_list.keys()
 
     @staticmethod
     def _convert_mongodb_output_to_json(data):
@@ -37,6 +40,16 @@ class BaseClass(Resource):
             return False
         return True
 
+    def _site_division_preprocess(self, site_division):
+        if len(site_division) > 3:    # has 2 levels
+            division_lv1 = site_division[:3]
+            division_lv2 = site_division[3:]
+            if division_lv1 in self.tw_lv1_list and division_lv2 in self.tw_division_list[division_lv1]:
+                return division_lv1, division_lv2
+        elif site_division in self.tw_lv1_list:     # only has 1 level
+            return site_division, ''
+        return None
+
     @staticmethod
     def _replace_tai(text):
         text = text.replace("台", "臺")
@@ -62,19 +75,23 @@ class BaseClass(Resource):
 
     def _query_site_list_by_division(self, site_type, site_division):
         results = list()
+        query_filter = dict()
         site_division = self._replace_tai(site_division)
+
         if site_division:
-            if len(site_division) > 3:
-                division_lv1 = site_division[:3]
-                division_lv2 = site_division[3:]
-                query_filter = {'site_region_lv1': division_lv1, 'site_region_lv2': division_lv2}
-            else:
-                query_filter = {'site_region_lv1': site_division}
-            query_result_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
-            for item in query_result_bson:
-                item = self._convert_mongodb_output_to_json(item)
-                del item["_id"]
-                results.append(item)
+            if (dv_tuple := self._site_division_preprocess(site_division)) is not None:
+                query_filter['site_region_lv1'] = dv_tuple[0]
+                if dv_tuple[1]:
+                    query_filter['site_region_lv2'] = dv_tuple[1]
+            else:  # Invalid site division input, return empty results immediately.
+                return results
+
+        # query database
+        query_result_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
+        for item in query_result_bson:
+            item = self._convert_mongodb_output_to_json(item)
+            del item["_id"]
+            results.append(item)
         return results
 
     def _count_site_by_type(self, site_type):
@@ -83,32 +100,38 @@ class BaseClass(Resource):
 
     def _count_site_by_division(self, site_type, site_division):
         count = 0
+        query_filter = dict()
         site_division = self._replace_tai(site_division)
+
         if site_division:
-            if len(site_division) > 3:
-                division_lv1 = site_division[:3]
-                division_lv2 = site_division[3:]
-                query_filter = {'site_region_lv1': division_lv1, 'site_region_lv2': division_lv2}
-            else:
-                query_filter = {'site_region_lv1': site_division}
-            count = self.db_controller.count_in_collection(resource=site_type, query_filter=query_filter)
+            if (dv_tuple := self._site_division_preprocess(site_division)) is not None:
+                query_filter['site_region_lv1'] = dv_tuple[0]
+                if dv_tuple[1]:
+                    query_filter['site_region_lv2'] = dv_tuple[1]
+            else:   # Invalid site division input, return 0 immediately.
+                return 0
+
+        # query database
+        count = self.db_controller.count_in_collection(resource=site_type, query_filter=query_filter)
         return count
 
     def _query_site_list_by_division_and_function_list(self, site_type, site_division, site_function_list):
         results = list()
         query_filter = dict()
         site_division = self._replace_tai(site_division)
+
         if site_division:
-            if len(site_division) > 3:
-                division_lv1 = site_division[:3]
-                division_lv2 = site_division[3:]
-                query_filter['site_region_lv1'] = division_lv1
-                query_filter['site_region_lv2'] = division_lv2
-            else:
-                query_filter['site_region_lv1'] = site_division
+            if (dv_tuple := self._site_division_preprocess(site_division)) is not None:
+                query_filter['site_region_lv1'] = dv_tuple[0]
+                if dv_tuple[1]:
+                    query_filter['site_region_lv2'] = dv_tuple[1]
+            else:   # Invalid site division input, return empty results immediately.
+                return results
+
         if site_function_list:
             query_filter['site_function_list'] = {'$all': site_function_list}
 
+        # query database
         query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
         for item in query_results_bson:
             item = self._convert_mongodb_output_to_json(item)
