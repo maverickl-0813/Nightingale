@@ -114,27 +114,3 @@ class BaseClass(Resource):
         # query database
         count = self.db_controller.count_in_collection(resource=site_type, query_filter=query_filter)
         return count
-
-    def _query_site_list_by_division_and_function_list(self, site_type, site_division, site_function_list):
-        results = list()
-        query_filter = dict()
-        site_division = self._replace_tai(site_division)
-
-        if site_division:
-            if (dv_tuple := self._site_division_preprocess(site_division)) is not None:
-                query_filter['site_region_lv1'] = dv_tuple[0]
-                if dv_tuple[1]:
-                    query_filter['site_region_lv2'] = dv_tuple[1]
-            else:   # Invalid site division input, return empty results immediately.
-                return results
-
-        if site_function_list:
-            query_filter['site_function_list'] = {'$all': site_function_list}
-
-        # query database
-        query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
-        for item in query_results_bson:
-            item = self._convert_mongodb_output_to_json(item)
-            del item["_id"]
-            results.append(item)
-        return results
