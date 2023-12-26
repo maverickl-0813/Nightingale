@@ -139,37 +139,3 @@ class GetSiteCountByDivision(BaseClass):
         site_count = self._count_site_by_division(site_type=site_type, site_division=site_division)
         result = {'total_count': site_count}
         return self._return_success_status(data=result)
-
-
-class GetSiteListByDivisionAndFunction(BaseClass):
-
-    def __init__(self):
-        super().__init__()
-        self.supported_medical_site = supported_medical_site
-
-    def get(self):
-        site_type = request.args.get("type")
-        site_division = request.args.get("division")
-        if in_function_list_str := request.args.get("function"):
-            site_function_list = in_function_list_str.split(',')
-        else:
-            site_function_list = None
-
-        if not self._is_required_args_exists([site_type, site_division, site_function_list]):
-            return self._return_error_status(status_code=400,
-                                             message=f"Query string incomplete.")
-
-        if not self._is_site_type_valid(site_type):
-            return self._return_error_status(status_code=400,
-                                             message=f"Not supported medical site type: {site_type}")
-
-        if len(site_function_list) == 1 and site_function_list[0] == '':
-            return self._return_error_status(status_code=400,
-                                             message=f"Function is not provided with \"function\" argument properly.")
-
-        query_result = self._query_site_list_by_division_and_function_list(site_type=site_type,
-                                                                           site_division=site_division,
-                                                                           site_function_list=site_function_list)
-        count = len(query_result)
-        result = {'total_count': count, 'items': query_result}
-        return self._return_success_status(data=result)
