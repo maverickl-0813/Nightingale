@@ -33,7 +33,6 @@ class SearchSites(BaseClass):
         query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
         for item in query_results_bson:
             item = self._convert_mongodb_output_to_json(item)
-            del item["_id"]
             results.append(item)
         return results
 

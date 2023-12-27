@@ -60,17 +60,24 @@ class BaseClass(Resource):
         query_results_bson = self.db_controller.query_multi_in_collection(resource=site_type)
         for item in query_results_bson:
             item = self._convert_mongodb_output_to_json(item)
-            del item["_id"]
             results.append(item)
         return results
 
-    def _query_site_type_by_id(self, site_type, site_id):
+    def _query_site_by_id(self, site_type, site_id, return_detail=True):
         query_result = None
+        query_projection = dict()
+        if not return_detail:
+            query_projection = {"site_region_lv1": 0,
+                                "site_region_lv2": 0,
+                                "site_service_list": 0,
+                                "site_function_list": 0,
+                                "site_working_hours": 0}
         if site_id:
             query_filter = {'site_id': site_id}
-            query_result_bson = self.db_controller.query_one_in_collection(resource=site_type, query_filter=query_filter)
+            query_result_bson = self.db_controller.query_one_in_collection(resource=site_type,
+                                                                           query_filter=query_filter,
+                                                                           query_projection=query_projection)
             query_result = self._convert_mongodb_output_to_json(query_result_bson)
-            del query_result["_id"]
         return query_result
 
     def _query_site_list_by_division(self, site_type, site_division):
@@ -90,7 +97,6 @@ class BaseClass(Resource):
         query_result_bson = self.db_controller.query_multi_in_collection(resource=site_type, query_filter=query_filter)
         for item in query_result_bson:
             item = self._convert_mongodb_output_to_json(item)
-            del item["_id"]
             results.append(item)
         return results
 
@@ -99,7 +105,6 @@ class BaseClass(Resource):
         return count
 
     def _count_site_by_division(self, site_type, site_division):
-        count = 0
         query_filter = dict()
         site_division = self._replace_tai(site_division)
 

@@ -22,10 +22,7 @@ class GetSiteBasicData(BaseClass):
             return self._return_error_status(status_code=400,
                                              message=f"Not supported medical site type: {site_type}")
 
-        query_result = self._query_site_type_by_id(site_type=site_type, site_id=site_id)
-        for key in ["site_region_lv1", "site_region_lv2", "site_service_list", "site_function_list",
-                    "site_working_hours"]:
-            del query_result[key]
+        query_result = self._query_site_by_id(site_type=site_type, site_id=site_id, return_detail=False)
         return self._return_success_status(data=query_result)
 
 
@@ -46,7 +43,7 @@ class GetSiteWorkingHours(BaseClass):
             return self._return_error_status(status_code=400,
                                              message=f"Not supported medical site type: {site_type}")
 
-        query_result = self._query_site_type_by_id(site_type=site_type, site_id=site_id)
+        query_result = self._query_site_by_id(site_type=site_type, site_id=site_id)
         result = query_result.pop("site_working_hours")
         return self._return_success_status(data=result)
 

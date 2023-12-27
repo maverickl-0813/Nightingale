@@ -10,6 +10,7 @@ class DataController:
         self.db_inst = None
         self.collection_inst = None
         self._init_db_conn()
+        self.default_projection = {'_id': 0}
 
     def _init_db_conn(self):
         self.db_client = pymongo.MongoClient('mongodb://127.0.0.1:27017')
@@ -19,27 +20,26 @@ class DataController:
         if self.db_inst is not None:
             self.collection_inst = self.db_inst[self.collection_name]
 
-    def display_collection(self, resource):
-        self.collection_name = resource
-        self._set_collection()
-        rows = self.collection_inst.find()
-        for row in rows:
-            print(row)
-
-    def query_one_in_collection(self, resource, query_filter=None):
+    def query_one_in_collection(self, resource, query_filter=None, query_projection=None):
         self.collection_name = resource
         self._set_collection()
         if not query_filter:
             query_filter = dict()
-        query_result = self.collection_inst.find_one(query_filter)
+        if not query_projection:
+            query_projection = dict()
+        query_projection.update(self.default_projection)
+        query_result = self.collection_inst.find_one(query_filter, query_projection)
         return query_result
 
-    def query_multi_in_collection(self, resource, query_filter=None):
+    def query_multi_in_collection(self, resource, query_filter=None, query_projection=None):
         self.collection_name = resource
         self._set_collection()
         if not query_filter:
             query_filter = dict()
-        query_result = self.collection_inst.find(query_filter)
+        if not query_projection:
+            query_projection = dict()
+        query_projection.update(self.default_projection)
+        query_result = self.collection_inst.find(query_filter, query_projection)
         return query_result
 
     def count_in_collection(self, resource, query_filter=None):
