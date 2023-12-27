@@ -2,7 +2,7 @@
 from bson import json_util
 import json
 from flask_restful import Resource
-from DataMaintenanceProcess.data_controller import DataController
+from DataMaintenance.data_controller import DataController
 import taiwan_division_list
 
 
