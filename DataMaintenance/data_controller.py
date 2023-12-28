@@ -13,7 +13,7 @@ class DataController:
         self.default_projection = {'_id': 0}
 
     def _init_db_conn(self):
-        self.db_client = pymongo.MongoClient('mongodb://127.0.0.1:27017')
+        self.db_client = pymongo.MongoClient('mongodb://nightingale-mongodb:27017')
         self.db_inst = self.db_client[self.db_name]
 
     def _set_collection(self):
