@@ -11,7 +11,7 @@ class MedicalSiteDataStructure:
         self._read_data_structure_and_mapping()
 
     def _read_data_structure_and_mapping(self):
-        data_structure_file = Path("medical_site_data_struct.yaml")
+        data_structure_file = Path(__file__).parent.resolve() / "medical_site_data_struct.yaml"
         with open(data_structure_file, 'r', encoding='utf-8') as ds:
             read_data = yaml.safe_load(ds)
             self.base_structure = read_data['fields']

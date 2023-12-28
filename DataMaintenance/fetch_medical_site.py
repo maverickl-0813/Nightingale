@@ -1,10 +1,10 @@
 import logging
 import requests
 import yaml
-from timer import timer
 from pathlib import Path
-from data_controller import DataController
-from medical_site_data_struct import MedicalSiteDataStructure
+from DataMaintenance.timer import timer
+from DataMaintenance.data_controller import DataController
+from DataMaintenance.medical_site_data_struct import MedicalSiteDataStructure
 
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
@@ -16,7 +16,7 @@ class FetchMedicalSites:
         self.db_controller = DataController()
 
     def _read_data_source_config(self):
-        config_file = Path("nhi_data_source_config.yaml")
+        config_file = Path(__file__).parent.resolve() / "nhi_data_source_config.yaml"
         with open(config_file, 'r', encoding='utf-8') as config:
             self.data_source_config = yaml.safe_load(config)
 
