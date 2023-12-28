@@ -1,0 +1,7 @@
+.venv
+med_data
+note.txt
+.dockerignore
+.gitignore
+start_mongo_docker.sh
+Dockerfile_nightingale-api

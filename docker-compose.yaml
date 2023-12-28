@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  nightingale-mongodb:
+    image: mongodb/mongodb-community-server:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  nightingale-api:
+    build:
+      context: .
+      dockerfile: Dockerfile_nightingale-api
+    ports:
+      - "6400:6400"
+    depends_on:
+      - nightingale-mongodb
+
+volumes:
+  mongodb_data:
