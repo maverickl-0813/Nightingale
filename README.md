@@ -1,3 +1,7 @@
+# The Nightingale Project
+This project is focused on display and analyze the medical resources in Taiwan.
+The data source is the open data from NHI (行政院衛生福利部中央健康保險署).
+
 # RESTful APIs (2023/12)
 
 ## List Medical Facilities (with specific type)
@@ -402,7 +406,7 @@ More examples:
 ### [POST] `/med_facility/search`
 Search the medical facility with variety of search keys.
 
-### Paremeters
+### Parameters
 
 `type` (required)
 
