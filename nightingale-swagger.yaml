@@ -1,0 +1,359 @@
+openapi: 3.0.0
+info:
+  title: Nightingale RESTful API
+  description: Todo
+  version: v1
+  
+servers:
+  - url: https://localhost:6400
+
+paths:
+
+  /med_facility/basic_info:
+    get:
+      summary: Get medical facility basic information.
+      description: | 
+        Fetch the basic information of the medical facility by providing the facility id. The id is defined by NHI.
+        * Facility id (defined by NHI)
+        * Name
+        * Facility Type
+        * Phone
+        * Address
+        * Remarks
+
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+          description: The medical facility type.
+          
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The medical facility id defined by NHI.
+        
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_basic_info'
+        '400':
+          description: Insufficient or invalid parameters
+  
+  /med_facility/count:
+    get:
+      summary: Count the medical facility with specific type.
+      
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+          description: The medical facility type.
+      
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_count'
+        '400':
+          description: Insufficient or invalid parameters
+  
+  /med_facility/list:
+    get:
+      summary: Get the full medical facility list of specific type.
+      
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+          description: The medical facility type.
+      
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_list_full_info'
+        '400':
+          description: Invalid input
+  
+  /med_facility/list_by_division:
+    get:
+      summary: Get a medical facility list of specific type with a given division name.
+      description: |
+        The city or county names (the first level) and the sections or townships names (the second level) in Taiwan. 
+        It will support value like: 台北市 or 台北市大安區, only if the given values exists. (names will be verified).
+        
+        More examples:
+        * 台中市西區 (Valid)
+        * 花蓮縣大安區 (Invalid, no such township or section in 花蓮縣)
+        * 高雄縣 (Invalid, the legacy city / county name is not supported.)
+      
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+          description: The medical facility type.
+        - in: query
+          name: division
+          required: true
+          schema:
+            type: string
+          description: The administrative district in Taiwan. (直轄市、縣、鄉鎮市區)
+      
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_list_full_info'
+        '400':
+          description: Invalid input
+  
+  /med_facility/count_by_division:
+    get:
+      summary: Count the specific medical facility with a given division name.
+      
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+          description: The medical facility type.
+        - in: query
+          name: division
+          required: true
+          schema:
+            type: string
+          description: The administrative district in Taiwan. (直轄市、縣、鄉鎮市區)
+      
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_count'
+        '400':
+          description: Invalid input
+
+  /med_facility/search:
+    post:
+      summary: Search the medical facilities with variety of search keys.
+      description: |
+        Given the search criteria via the request body, this API returns a list of medical facilties matches the criteria.
+      
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: array
+                  description: Should be a list of facility types, provide at least 1 type.
+                  items:
+                    type: string
+                    enum: [medical_center, regional_hospital, district_hospital, small_clinic]
+                    example: district_hospital, small_clinic
+                division:
+                  type: string
+                  example: 臺中市
+                function:
+                  type: array
+                  description: Should be a list of medical department or function.
+                  items:
+                    type: string
+                    example: 家醫科, 內科
+                keyword:
+                  type: string
+                  description: The full or partial name of the medical facility.
+                  example: 內科診所
+      
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/site_list_full_info'
+        '400':
+          description: |
+            Invalid input:
+            * Search criteria is incomplete.
+            * Unsupported medical facility type
+
+
+
+components:
+  schemas:
+    site_basic_info:
+      type: object
+      properties:
+        site_id:
+          type: string
+          example: 0401180014
+        site_name:
+          type: string
+          example: 國立臺灣大學醫學院附設醫院
+        site_type:
+          type: string
+          example: 醫學中心
+        site_telephone:
+          type: string
+          example: 02-23123456
+        site_address:
+          type: string
+          example: 臺北市中正區中山南路7、8號；常德街1號
+        site_remark:
+          type: string
+          example: 急診全年無休，24小時提供服務；西址院區周六未開診，部分診改至兒醫大樓
+  
+    site_list_full_info:
+      type: object
+      properties:
+        total_count:
+          type: number
+          example: 1
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              site_id:
+                type: string
+                example: 1142100017
+              site_name:
+                type: string
+                example: 長庚醫療財團法人高雄長庚紀念醫院
+              site_type:
+                type: string
+                example: 醫學中心
+              site_telephone:
+                type: string
+                example: 07-7317123
+              site_address:
+                type: string
+                example: 高雄市鳥松區大埤路123號
+              site_region_lv1:
+                type: string
+                example: 高雄市
+              site_region_lv2:
+                type: string
+                example: 鳥松區
+              site_service_list:
+                type: array
+                items:
+                  type: string
+                  example: [門診診療, 住院診療, 兒童預防保健, 成人預防保健, ...etc]
+              site_function_list:
+                type: array
+                items:
+                  type: string
+                  example: [家醫科, 內科, 外科, 兒科, ...etc]
+              site_working_hours:
+                $ref: '#/components/schemas/site_working_hours'
+              site_remark:
+                type: string
+                example: 本院急診室提供全天24小時急診醫療服務
+
+    site_working_hours:
+      type: object
+      properties:
+        Monday:
+          $ref: '#/components/schemas/site_working_daily'
+        Tuesday:
+          $ref: '#/components/schemas/site_working_daily'
+        Wednesday:
+          $ref: '#/components/schemas/site_working_daily'
+        Thursday:
+          $ref: '#/components/schemas/site_working_daily'
+        Friday:
+          $ref: '#/components/schemas/site_working_daily'
+        Saturday:
+          $ref: '#/components/schemas/site_working_daily'
+        Sunday:
+          $ref: '#/components/schemas/site_working_daily'
+  
+    site_working_daily:
+      type: object
+      properties:
+        morning:
+          type: string
+          example: Y
+        afternoon:
+          type: string
+          example: Y
+        evening:
+          type: string
+          example: Y
+  
+    site_count:
+      type: object
+      properties:
+        total_count:
+          type: number
+          example: 24222
+  
+  
+  
