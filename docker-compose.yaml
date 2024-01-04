@@ -11,7 +11,7 @@ services:
   nightingale-api:
     build:
       context: .
-      dockerfile: Dockerfile_nightingale-api
+      dockerfile: DockerFile
     ports:
       - "6400:6400"
     depends_on:
