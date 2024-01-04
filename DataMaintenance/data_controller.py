@@ -1,3 +1,4 @@
+import os
 import pymongo
 
 
@@ -13,7 +14,10 @@ class DataController:
         self.default_projection = {'_id': 0}
 
     def _init_db_conn(self):
-        self.db_client = pymongo.MongoClient('mongodb://nightingale-mongodb:27017')
+        uri = "mongodb+srv://nightingale-db.wgbwctt.mongodb.net/"
+        cert_file = f"{os.path.dirname(os.path.abspath(__file__))}/cert_file/X509-cert-1429016553120893234.pem"
+        self.db_client = pymongo.MongoClient(uri, tls=True, authMechanism="MONGODB-X509",
+                                             authSource="$external", tlsCertificateKeyFile=cert_file)
         self.db_inst = self.db_client[self.db_name]
 
     def _set_collection(self):
