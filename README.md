@@ -588,5 +588,6 @@ The full or partial name of the medical facility.
 ## Upcoming / Todo list
 * Frontend integration with Grafana dashboards
 * Add more web APIs for data displaying
-* Provide swagger.json
+* Integrate with nginx 
+* Provide swagger.json -> nightingale-swagger.json (deliver with API service)
 * Cloud deployment (APP Engine + MangoDB Atlas)
