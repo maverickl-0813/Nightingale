@@ -1,12 +1,12 @@
 version: '3'
 
 services:
-  nightingale-mongodb:
-    image: mongodb/mongodb-community-server:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+#  nightingale-mongodb:
+#    image: mongodb/mongodb-community-server:latest
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongodb_data:/data/db
 
   nightingale-api:
     build:
@@ -25,6 +25,6 @@ services:
       - grafana-storage:/var/lib/grafana
 
 volumes:
-  mongodb_data: {}
+  # mongodb_data: {}
   grafana-storage: {}
 
