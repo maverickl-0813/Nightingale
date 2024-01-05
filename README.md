@@ -2,11 +2,11 @@
 This project is focused on display and analyze the medical resources in Taiwan.
 The data source is the open data from NHI (行政院衛生福利部中央健康保險署).
 
-# RESTful APIs (2023/12)
+# RESTful APIs (2024/1)
 
 ## List Medical Facilities (with specific type)
 
-### [GET] `/med_facility/basic_info`
+### [GET] `/v1/facilities/<facility_id>`
 Get medical facility basic information.
 * Facility id (defined by NHI)
 * Name
@@ -16,18 +16,10 @@ Get medical facility basic information.
 * Remarks
 
 ### Parameters
-`type` (required)
-
-#### Valid Options
-- medical_center
-- regional_hospital
-- district_hospital
-- small_clinic
-
-`id` (required) -> The medical facility id defined by NHI.
+`facility_id` (required) -> The medical facility id defined by NHI.
 
 ### Request (example)
-`/med_facility/basic_info?type=medical_center&id=0401180014`
+`/v1/facilities/0401180014`
 
 ### Response (example)
 
@@ -52,11 +44,11 @@ Get medical facility basic information.
 
 ***
 
-### [GET] `/med_facility/count`
-Count the medical facility with specific type.
+### [GET] `/v1/facilities/<facility_type>/count`
+Count the medical facility with specific type. Add "division" as query string will limit the division (area).
 
 ### Parameters
-`type` (required)
+`facility_type` (required)
 
 #### Valid Options
 - medical_center
@@ -64,8 +56,21 @@ Count the medical facility with specific type.
 - district_hospital
 - small_clinic
 
+`division` (optional)
+
+#### Valid Options
+The city or county names (the first level) and the sections or townships names (the second level) in Taiwan.
+It will support value like: `台北市` or `台北市大安區`, only if the given values exists. (names will be verified).
+
+More examples:
+- `台中市西區` is valid
+- `花蓮縣大安區` is invalid (no such township or section in 花蓮縣)
+- `高雄縣` is invalid (the old city / county name is not supported)
+
 ### Request (example)
-`/med_facility/count?type=small_clinic`
+`/v1/facilities/medical_center/count`
+
+`/v1/facilities/small_clinic/count?division=臺東縣臺東市`
 
 ### Response (example)
 
@@ -79,11 +84,11 @@ Count the medical facility with specific type.
 ```
 ***
 
-### [GET] `/med_facility/list`
-Get the full medical facility list of specific type.
+### [GET] `/v1/facilities/<facility_type>/list`
+Get the full medical facility list of specific type. Add "division" as query string will limit the division (area).
 
 ### Parameters
-`type` (required)
+`facility_type` (required)
 
 #### Valid Options
 - medical_center
@@ -91,8 +96,21 @@ Get the full medical facility list of specific type.
 - district_hospital
 - small_clinic
 
+`division` (optional)
+
+#### Valid Options
+The city or county names (the first level) and the sections or townships names (the second level) in Taiwan.
+It will support value like: `台北市` or `台北市大安區`, only if the given values exists. (names will be verified).
+
+More examples:
+- `台中市西區` is valid
+- `花蓮縣大安區` is invalid (no such township or section in 花蓮縣)
+- `高雄縣` is invalid (the old city / county name is not supported)
+
 ### Request (example)
-`/med_facility/list?type=medical_center`
+`/v1/facilities/medical_center/list`
+
+`/v1/facilities/medical_center/list?division=臺南市`
 
 ### Response (example)
 
@@ -217,193 +235,9 @@ Get the full medical facility list of specific type.
 
 ***
 
-### [GET] `/med_facility/list_by_division`
-Get a medical facility list of specific type with a given division name.
-
-### Parameters
-`type` (required)
-
-#### Valid Options
-- medical_center
-- regional_hospital
-- district_hospital
-- small_clinic
-
-`division` (required)
-
-#### Valid Options
-The city or county names (the first level) and the sections or townships names (the second level) in Taiwan.
-It will support value like: `台北市` or `台北市大安區`, only if the given values exists. (names will be verified).
-
-More examples:
-- `台中市西區` is valid
-- `花蓮縣大安區` is invalid (no such township or section in 花蓮縣)
-- `高雄縣` is invalid (the old city / county name is not supported)
-
-### Request (example)
-`/med_facility/list_by_division?type=medical_center&division=臺北市大安區`
-
-### Response (example)
-
-<details> 
-    <summary>Expand</summary>
-
-```json
-
-{
-    "status": "success",
-    "data": {
-        "total_count": 1,
-        "items": [
-            {
-                "site_id": "1101020018",
-                "site_name": "國泰醫療財團法人國泰綜合醫院",
-                "site_type": "醫學中心",
-                "site_telephone": "02-27082121",
-                "site_address": "臺北市大安區仁愛路4段280號，266巷6號",
-                "site_region_lv1": "臺北市",
-                "site_region_lv2": "大安區",
-                "site_service_list": [
-                    "復健－物理治療業務",
-                    "復健－職能治療業務",
-                    "復健－語言治療業務",
-                    "門診診療",
-                    "住院診療",
-                    "血液透析",
-                    "兒童預防保健",
-                    "成人預防保健",
-                    "婦女子宮頸抹片檢查",
-                    "孕婦產檢",
-                    "分娩",
-                    "義肢業務",
-                    "兒童牙齒預防保健",
-                    "結核病",
-                    "口腔黏膜檢查",
-                    "定量免疫法糞便潛血檢查"
-                ],
-                "site_function_list": [
-                    "不分科",
-                    "家醫科",
-                    "內科",
-                    "外科",
-                    "兒科",
-                    "婦產科",
-                    "骨科",
-                    "神經外科",
-                    "泌尿科",
-                    "耳鼻喉科",
-                    "眼科",
-                    "皮膚科",
-                    "神經科",
-                    "精神科",
-                    "復健科",
-                    "整形外科",
-                    "職業醫學科",
-                    "急診醫學科",
-                    "牙科",
-                    "牙髓病科",
-                    "牙周病科",
-                    "齒顎矯正科",
-                    "兒童牙科",
-                    "口腔顎面外科",
-                    "家庭牙醫科",
-                    "麻醉科",
-                    "核子醫學科",
-                    "放射腫瘤科",
-                    "放射診斷科",
-                    "解剖病理科",
-                    "臨床病理科"
-                ],
-                "site_working_hours": {
-                    "Monday": {
-                        "morning": "Y",
-                        "afternoon": "Y",
-                        "evening": "Y"
-                    },
-                    "Tuesday": {
-                        "morning": "Y",
-                        "afternoon": "Y",
-                        "evening": "Y"
-                    },
-                    "Wednesday": {
-                        "morning": "Y",
-                        "afternoon": "Y",
-                        "evening": "Y"
-                    },
-                    "Thursday": {
-                        "morning": "Y",
-                        "afternoon": "Y",
-                        "evening": "Y"
-                    },
-                    "Friday": {
-                        "morning": "Y",
-                        "afternoon": "Y",
-                        "evening": "Y"
-                    },
-                    "Saturday": {
-                        "morning": "Y",
-                        "afternoon": "N",
-                        "evening": "N"
-                    },
-                    "Sunday": {
-                        "morning": "N",
-                        "afternoon": "N",
-                        "evening": "N"
-                    }
-                },
-                "site_remark": "急診全年無休，24小時提供服務"
-            }
-        ]
-    }
-}
-
-```
-
-</details>
-
-***
-
-### [GET] `/med_facility/count_by_division`
-Count the specific medical facility with a given division name.
-
-### Parameters
-`type` (required)
-
-#### Valid Options
-- medical_center
-- regional_hospital
-- district_hospital
-- small_clinic
-
-`division` (required)
-
-#### Valid Options
-The city or county names (the first level) and the sections or townships names (the second level) in Taiwan.
-It will support value like: `台北市` or `台北市大安區`, only if the given values exists. (names will be verified).
-
-More examples:
-- `台中市西區` is valid
-- `花蓮縣大安區` is invalid (no such township or section in 花蓮縣)
-- `高雄縣` is invalid (the old city / county name is not supported)
-
-### Request (example)
-`/med_facility/count_by_division?type=small_clinic&division=臺北市大安區`
-
-### Response (example)
-
-```json
-{
-    "status": "success",
-    "data": {
-        "total_count": 603
-    }
-}
-```
-***
-
 
 ## Search Medical Facilities
-### [POST] `/med_facility/search`
+### [POST] `/v1/facilities/search`
 Search the medical facility with variety of search keys.
 
 ### Parameters
@@ -440,7 +274,7 @@ The full or partial name of the medical facility.
 
 ### Request (example)
 
-`/med_facility/search`
+`/v1/facilities/search`
 
 (JSON formatted request body)
 
@@ -583,7 +417,7 @@ The full or partial name of the medical facility.
 ***
 
 ## Unfinished or experimental
-* /med_facility/working_hours
+* `/v1/facilities/<facility_id>/working_hours`
 
 ## Upcoming / Todo list
 * Frontend integration with Grafana dashboards
