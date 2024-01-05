@@ -1,14 +1,14 @@
 from flask import request
 from api_service_base import BaseClass
 
-supported_medical_site = ["medical_center", "regional_hospital", "district_hospital", "small_clinic"]
+supported_facility_type = ["medical_center", "regional_hospital", "district_hospital", "small_clinic"]
 
 
 class SearchSites(BaseClass):
 
     def __init__(self):
         super().__init__()
-        self.supported_medical_site = supported_medical_site
+        self.supported_facility_type = supported_facility_type
 
     def _query_sites(self, site_type, site_division, site_function_list, site_name_kw):
         results = list()

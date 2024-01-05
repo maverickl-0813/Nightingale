@@ -9,7 +9,7 @@ import taiwan_division_list
 class BaseClass(Resource):
     def __init__(self):
         self.db_controller = DataController()
-        self.supported_medical_site = list()
+        self.supported_facility_type = list()
         self.tw_division_list = taiwan_division_list.area_data
         self.tw_lv1_list = self.tw_division_list.keys()
 
@@ -36,7 +36,7 @@ class BaseClass(Resource):
         return True
 
     def _is_site_type_valid(self, site_type):
-        if site_type not in self.supported_medical_site:
+        if site_type not in self.supported_facility_type:
             return False
         return True
 

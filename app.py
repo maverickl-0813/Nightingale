@@ -5,8 +5,6 @@ from service_facility_by_type import GetSiteBasicData
 from service_facility_by_type import GetSiteCountByType
 from service_facility_by_type import GetMedicalSiteList
 from service_facility_by_type import GetSiteWorkingHours
-from service_facility_by_type import GetSiteListByDivision
-from service_facility_by_type import GetSiteCountByDivision
 from service_facility_search import SearchSites
 
 
@@ -14,13 +12,11 @@ app = Flask(__name__)
 api = Api(app)
 
 endpoints = {
-    "/med_facility/basic_info": GetSiteBasicData,
-    "/med_facility/count": GetSiteCountByType,
-    "/med_facility/list": GetMedicalSiteList,
-    "/med_facility/working_hours": GetSiteWorkingHours,
-    "/med_facility/list_by_division": GetSiteListByDivision,
-    "/med_facility/count_by_division": GetSiteCountByDivision,
-    "/med_facility/search": SearchSites
+    "/v1/facilities/<string:site_id>": GetSiteBasicData,
+    "/v1/facilities/<string:site_id>/working_hours": GetSiteWorkingHours,
+    "/v1/facilities/<string:site_type>/count": GetSiteCountByType,
+    "/v1/facilities/<string:site_type>/list": GetMedicalSiteList,
+    "/v1/facilities/search": SearchSites
 }
 
 
