@@ -19,15 +19,18 @@ endpoints = {
     "/v1/facilities/search": SearchSites
 }
 
+for endpoint, func in endpoints.items():
+    api.add_resource(func, endpoint)
 
-@app.route('/nightingale-openapi.json')
-def swagger():
-    with open('nightingale-openapi.json', 'r') as f:
-        response = jsonify(json.load(f))
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "*")
-        response.headers.add("Access-Control-Allow-Methods", "*")
-        return response
+
+# @app.route('/nightingale-openapi.json')
+# def swagger():
+#     with open('nightingale-openapi.json', 'r') as f:
+#         response = jsonify(json.load(f))
+#         response.headers.add("Access-Control-Allow-Origin", "*")
+#         response.headers.add("Access-Control-Allow-Headers", "*")
+#         response.headers.add("Access-Control-Allow-Methods", "*")
+#         return response
 
 
 if __name__ == '__main__':
@@ -35,4 +38,3 @@ if __name__ == '__main__':
         api.add_resource(func, endpoint)
 
     app.run(host='0.0.0.0', port=6400, ssl_context="adhoc")
-    # app.run(host='0.0.0.0', port=6400)
