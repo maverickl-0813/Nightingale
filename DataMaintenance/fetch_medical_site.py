@@ -1,6 +1,7 @@
 import logging
 import requests
 import yaml
+from datetime import datetime
 from pathlib import Path
 from DataMaintenance.timer import timer
 from DataMaintenance.data_controller import DataController
@@ -66,6 +67,10 @@ class FetchMedicalSites:
             i += 1
 
         logging.info(f"Fetched total {len(data_records)} entries, compared with NHI data count {data_count}.")
+        if len(data_records) != data_count:
+            logging.error("Count mismatch, synchronization error. Abort this round.")
+            return None
+
         return data_records
 
     def _process_data_to_db(self, db_collection):
@@ -73,6 +78,9 @@ class FetchMedicalSites:
         identifier_id = self.data_source_config.get("identifiers").get(db_collection)   # For fetching data count.
         resource_id = self.data_source_config.get("resources").get(db_collection)
         data_list = self._request_data_with_resource_id(identifier_id, resource_id)
+        if not data_list:
+            return 0
+
         logging.debug(f"Processing new data for collection {db_collection}.")
         if self.db_controller.count_in_collection(db_collection) == 0:
             logging.debug("No data found in local database. Insert everything.")
@@ -98,39 +106,68 @@ class FetchMedicalSites:
         count = self.db_controller.count_in_collection(db_collection)
         return count
 
+    def _set_timestamp_for_successful_sync(self, db_collection, entry_count):
+        metadata_collection = 'sync_metadata'
+        current_datatime = str(datetime.now())
+        update_for_collection = {'collection': db_collection}
+        new_timestamp = {'collection': db_collection,
+                         'last_successful_sync': current_datatime,
+                         'last_entry_count': entry_count}
+        self.db_controller.replace_one_to_collection(metadata_collection, update_for_collection, new_timestamp)
+
     @timer
     def update_medical_centers(self):
         db_collection = "medical_center"
         processed_count = self._process_data_to_db(db_collection=db_collection)
-        logging.debug(f"Data Secured. There are {processed_count} entries of medical centers.")
+        if processed_count == 0:
+            logging.error(f"Synchronization from NHI error, no data was updated.")
+        else:
+            self._set_timestamp_for_successful_sync(db_collection, processed_count)
+            logging.debug(f"Data Secured. There are {processed_count} entries of medical centers.")
 
     @timer
     def update_regional_hospital(self):
         db_collection = "regional_hospital"
         processed_count = self._process_data_to_db(db_collection=db_collection)
-        logging.debug(f"Data Secured. There are {processed_count} entries of regional hospitals.")
+        if processed_count == 0:
+            logging.error(f"Synchronization from NHI error, no data was updated.")
+        else:
+            self._set_timestamp_for_successful_sync(db_collection, processed_count)
+            logging.debug(f"Data Secured. There are {processed_count} entries of regional hospitals.")
 
     @timer
     def update_district_hospital(self):
         db_collection = "district_hospital"
         processed_count = self._process_data_to_db(db_collection=db_collection)
-        logging.debug(f"Data Secured. There are {processed_count} entries of district_hospitals.")
+        if processed_count == 0:
+            logging.error(f"Synchronization from NHI error, no data was updated.")
+        else:
+            self._set_timestamp_for_successful_sync(db_collection, processed_count)
+            logging.debug(f"Data Secured. There are {processed_count} entries of district hospitals.")
 
     @timer
     def update_small_clinic(self):
         db_collection = "small_clinic"
         processed_count = self._process_data_to_db(db_collection=db_collection)
-        logging.debug(f"Data Secured. There are {processed_count} entries of small clinics.")
+        if processed_count == 0:
+            logging.error(f"Synchronization from NHI error, no data was updated.")
+        else:
+            self._set_timestamp_for_successful_sync(db_collection, processed_count)
+            logging.debug(f"Data Secured. There are {processed_count} entries of small clinics.")
 
     @timer
     def update_pharmacy(self):
         db_collection = "pharmacy"
         processed_count = self._process_data_to_db(db_collection=db_collection)
-        logging.debug(f"Data Secured. There are {processed_count} entries of pharmacies.")
+        if processed_count == 0:
+            logging.error(f"Synchronization from NHI error, no data was updated.")
+        else:
+            self._set_timestamp_for_successful_sync(db_collection, processed_count)
+            logging.debug(f"Data Secured. There are {processed_count} entries of pharmacies.")
 
     def update_all(self):
         self.update_medical_centers()
         self.update_regional_hospital()
         self.update_district_hospital()
         self.update_small_clinic()
-        self.update_pharmacy()
+        # self.update_pharmacy()
