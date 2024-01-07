@@ -7,3 +7,5 @@ Dockerfile
 nightingale-openapi.json
 nightingale-swagger.yaml
 DataMaintenance/cert_file
+nightingale-cloud-user.txt
+docker-compose.yaml
