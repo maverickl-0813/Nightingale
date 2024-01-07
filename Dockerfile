@@ -1,4 +1,5 @@
 FROM python:3.11-slim
+LABEL authors="maverickl-0813"
 
 # Install dependencies for building uwsgi
 RUN apt update
@@ -23,7 +24,6 @@ COPY --chown=${user}:${group} DataMaintenance DataMaintenance
 COPY --chown=${user}:${group} *.py ./
 COPY --chown=${user}:${group} *.ini ./
 COPY --chown=${user}:${group} start_service.sh ./
-COPY --chown=${user}:${group} crontab_sync_nhi ./
 
 # Port 6400 is the flask service port
 EXPOSE 6400
