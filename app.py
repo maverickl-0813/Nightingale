@@ -34,7 +34,5 @@ for endpoint, func in endpoints.items():
 
 
 if __name__ == '__main__':
-    for endpoint, func in endpoints.items():
-        api.add_resource(func, endpoint)
-
-    app.run(host='0.0.0.0', port=6400, ssl_context="adhoc")
+    # For testing without starting uwsgi.
+    app.run(host='0.0.0.0', port=6400)
