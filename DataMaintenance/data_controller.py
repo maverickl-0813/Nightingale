@@ -1,11 +1,14 @@
 import os
+import logging
 import pymongo
+from pymongo.errors import *
 
 
 class DataController:
 
     def __init__(self):
         self.db_name = "med_data_db"
+        self.mongodb_host = os.environ['MONGODB_HOST']
         self.mongodb_user = os.environ['MONGODB_USER']
         self.mongodb_pass = os.environ['MONGODB_PASS']
         self.collection_name = None
@@ -15,18 +18,40 @@ class DataController:
         self._init_db_conn()
         self.default_projection = {'_id': 0}
 
+    def _validate_db_conn_strings(self):
+        if not self.mongodb_host:
+            logging.error("MONGODB_HOST is not supplied.")
+            return False
+        if not self.mongodb_user:
+            logging.error("MONGODB_USER is not supplied.")
+            return False
+        if not self.mongodb_pass:
+            logging.error("MONGODB_PASS is not supplied.")
+            return False
+        return True
+
     def _init_db_conn(self):
-        # uri = "mongodb+srv://nightingale-db.wgbwctt.mongodb.net/"
-        # cert_file = f"{os.path.dirname(os.path.abspath(__file__))}/cert_file/X509-cert-1429016553120893234.pem"
-        # self.db_client = pymongo.MongoClient(uri, tls=True, authMechanism="MONGODB-X509",
-        #                                      authSource="$external", tlsCertificateKeyFile=cert_file)
-        uri = f"mongodb+srv://{self.mongodb_user}:{self.mongodb_pass}@nightingale-db.wgbwctt.mongodb.net/"
-        self.db_client = pymongo.MongoClient(uri)
-        self.db_inst = self.db_client[self.db_name]
+        if self._validate_db_conn_strings():
+            uri = f"mongodb+srv://{self.mongodb_user}:{self.mongodb_pass}@{self.mongodb_host}/"
+        else:
+            raise ValueError("Cannot compose the URI for MongoDB connection.")
+
+        try:
+            self.db_client = pymongo.MongoClient(uri)
+            self.db_inst = self.db_client[self.db_name]
+        except ConnectionFailure as e:
+            emsg = f"Connection with MongoDB failed. Reason: str{e}"
+            logging.error(emsg)
+            raise emsg
+        except Exception:
+            raise
 
     def _set_collection(self):
         if self.db_inst is not None:
-            self.collection_inst = self.db_inst[self.collection_name]
+            try:
+                self.collection_inst = self.db_inst[self.collection_name]
+            except CollectionInvalid:
+                raise
 
     def query_one_in_collection(self, resource, query_filter=None, query_projection=None):
         self.collection_name = resource
